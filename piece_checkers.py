@@ -13,10 +13,11 @@ def check_pawn(board, color, from_, to):
     # Case 1 and 2
     if from_[0] == to[0]:
         direction = 1 if color == "b" else -1
-        first_turn = from_[1] == ((8 + direction) % 8)
+        first_turn = (color == "b" and from_[1] == 1) or (color == "w" and from_[1] == 6)
+
         if (from_[1] + direction == to[1]) and (board.get(*to) == ""):
             return True
-        elif first_turn and (from_[1] + direction * 2 == to[1]) and (board.get(to[0], to[1] + direction) == "") and (board.get(*to) == ""):
+        elif first_turn and (from_[1] + direction * 2 == to[1]) and (board.get(to[0], to[1] - direction) == "") and (board.get(*to) == ""):
             return True
         else:
             return False
