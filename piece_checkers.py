@@ -23,3 +23,29 @@ def check_pawn(board, color, from_, to):
             return False
     else:
         return False  # TODO: Rest of pawn movement
+
+def check_castle(board, color, from_, to):
+    """
+    Can only move to places with the same x or y value, where all the spaces in between them are free.
+    """
+
+    piece_at_to = board.get(*to)
+    if piece_at_to != "" and piece_at_to[0] == color:
+        return False
+
+    if from_[0] == to[0]:  # On same vertical line
+        start = min(from_[1], to[1]) + 1
+        end = max(from_[1], to[1]) - 1
+        for y in range(start, end + 1):
+            if board.get(from_[0], y) != "":
+                return False
+        return True
+    elif from_[1] == to[1]:  # On same horizontal line
+        start = min(from_[0], to[0]) + 1
+        end = max(from_[0], to[0]) - 1
+        for x in range(start, end + 1):
+            if board.get(x, from_[1]) != "":
+                return False
+        return True
+    else:  # Somewhere else
+        return False
