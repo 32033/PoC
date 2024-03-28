@@ -6,6 +6,8 @@ from piece_checkers import *
 window = tk.Tk()
 board = Board()
 
+debug_colors: bool = True  # Show colors depending on the states of various parts of the board
+
 currently_selected: Union[tuple[int, int], None] = None
 
 def square_clicked(destination):
@@ -32,6 +34,19 @@ def square_clicked(destination):
         piece = board.get(*currently_selected)
         board.set(*currently_selected, "")
         board.set(*destination, piece)
+
+        # Check kill via en passant
+        if piece[1] == "p" and currently_selected[0] != destination[0] and board.get(*destination) != "":
+            # ^ If the piece being moved is a pawn, it moves in the x direction but to an empty space
+            board.set(destination[0], currently_selected[1], "")
+
+        # Check enable en passant
+        if piece[1] == "p" and currently_selected[0] == destination[0] and abs(currently_selected[1] - destination[1]) == 2:
+            # ^ Checks if it is a pawn, the x is the same, and the y changed by two
+            board.set_en_passant(*destination)
+        else:  # Otherwise remove it
+            board.remove_en_passant()
+
         currently_selected = None
 
 
@@ -60,7 +75,12 @@ def redraw_board():
 
             piece = piece if piece != "" else "."
 
-            b = tk.Button(window, text=piece, state=tk.DISABLED if not enabled else tk.NORMAL,
+            color = None
+            if debug_colors:
+                if board.is_en_passant(x, y):
+                    color = "red"
+
+            b = tk.Button(window, fg=color, text=piece, state=tk.DISABLED if not enabled else tk.NORMAL,
                           command=lambda destination=(x, y): square_clicked(destination))
             b.grid(row=y, column=x)
 

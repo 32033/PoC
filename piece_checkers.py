@@ -7,7 +7,7 @@ def check_pawn(board, color, from_, to):
     Move one forward: when spot in front is free.
     Move two forward: when both spots in front are free, and only on first turn (y is 1 for black, or 6 for white).
     Move one diagonally forward: when a piece is diagonally in front of it.
-    Move one diagonally forward: When the piece directly to that side is a pawn that has just moved two forward.
+    Move one diagonally forward: When the piece directly to that side is a pawn that has just moved two forward (en passant).
     """
 
     direction = 1 if color == "b" else -1
@@ -15,22 +15,24 @@ def check_pawn(board, color, from_, to):
     # Case 1 and 2
     if from_[0] == to[0]:
         first_turn = (color == "b" and from_[1] == 1) or (color == "w" and from_[1] == 6)
-
+        # Case 1
         if (from_[1] + direction == to[1]) and (board.get(*to) == ""):
             return True
+        # Case 2
         elif first_turn and (from_[1] + direction * 2 == to[1]) and (board.get(to[0], to[1] - direction) == "") and (board.get(*to) == ""):
             return True
-        else:
-            return False
     
-    # Case 2
-    elif abs(from_[0] - to[0]) == 1 and from_[1] + direction == to[1]:  # Checks if on adjacant column and 1 movement forward
+    # Case 3 and 4
+    elif abs(from_[0] - to[0]) == 1 and from_[1] + direction == to[1]:  # Checks if on adjacent column and 1 movement forward
+        # Case 3
         if board.get(*to) != "" and board.get(*to)[0] != color:  # If space is not free and color is opposite
             return True
-        else:
-            return False
+        # Case 4
+        elif board.get(*to) == "" and board.is_en_passant(to[0], from_[1]):  # If space is free and space on that side is en passant able
+            return True
+
     else:
-        return False  # TODO: Case 3
+        return False
 
 def check_castle(board, color, from_, to):
     """
