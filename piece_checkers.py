@@ -1,4 +1,4 @@
-import math
+from math import *
 
 
 def check_pawn(board, color, from_, to):
@@ -10,9 +10,13 @@ def check_pawn(board, color, from_, to):
     Move one diagonally forward: When the piece directly to that side is a pawn that has just moved two forward.
     """
 
+    direction = 1 if color == "b" else -1
+
     # Case 1 and 2
+    print(from_, to)
+    print(abs(from_[0] - to[0]), from_[1] + direction == to[1])
+    print(board.get(*to) != "" and board.get(*to)[0] != color)
     if from_[0] == to[0]:
-        direction = 1 if color == "b" else -1
         first_turn = (color == "b" and from_[1] == 1) or (color == "w" and from_[1] == 6)
 
         if (from_[1] + direction == to[1]) and (board.get(*to) == ""):
@@ -21,8 +25,15 @@ def check_pawn(board, color, from_, to):
             return True
         else:
             return False
+    
+    # Case 2
+    elif abs(from_[0] - to[0]) == 1 and from_[1] + direction == to[1]:  # Checks if on adjacant column and 1 movement forward
+        if board.get(*to) != "" and board.get(*to)[0] != color:  # If space is not free and color is opposite
+            return True
+        else:
+            return False
     else:
-        return False  # TODO: Rest of pawn movement
+        return False  # TODO: Case 3
 
 def check_castle(board, color, from_, to):
     """
