@@ -78,8 +78,13 @@ def check_horse(board, color, from_, to):
 
 def check_bishop(board, color, from_, to):
     """
-    Can only move on diagonalls in a straigt line. All the spaces in between must be free.
+    Can only move on diagonals in a straight line. All the spaces in between must be free.
     """
+
+    # Remove any pieces of same color as can't take own pieces.
+    piece_at_to = board.get(*to)
+    if piece_at_to != "" and piece_at_to[0] == color:
+        return False
 
     horizontal = abs(from_[0] - to[0])
     vertical = abs(from_[1] - to[1])
@@ -89,13 +94,12 @@ def check_bishop(board, color, from_, to):
         # Check spaces are free
         x_multiplier = -(from_[0] - to[0]) / horizontal
         y_multiplier = -(from_[1] - to[1]) / vertical
-        for n in range(1, horizontal + 1):
+        for n in range(1, horizontal - 1):
             x = int(from_[0] + n * x_multiplier)
             y = int(from_[1] + n * y_multiplier)
-            print(x, y, from_, n)
             if board.get(x, y) != "":
                 return False
-            # TODO: collide with other pieces
+
         return True
     
     else:
