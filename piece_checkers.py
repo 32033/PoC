@@ -111,3 +111,22 @@ def check_queen(*args):
     Can move in the union of the movements of bishops and castles (AKA straights and diagonals)
     """
     return check_castle(*args) or check_bishop(*args)
+
+def check_king(board, color, from_, to):
+    """
+    King can move one space in any direction, however cannot move into check.
+    """
+
+    # Check wouldn't take own color
+    piece_at_to = board.get(*to)
+    if piece_at_to != "" and piece_at_to[0] == color:
+        return False
+
+    # TODO: Check if move will put in check
+    horizontal = abs(from_[0] - to[0])
+    vertical = abs(from_[1] - to[1])
+    sum_ = horizontal + vertical
+    if sum_ == 1 or (sum_ == 2 and horizontal == vertical): # If moved straight, or moved one diagonally
+        return True
+    else:
+        return False
