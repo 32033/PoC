@@ -79,6 +79,8 @@ def check_if_possible_move(destination):
         return True
     elif piece_type == "c" and check_castle(board, piece_color, currently_selected, destination):
         return True
+    elif piece_type == "h" and check_horse(board, piece_color, currently_selected, destination):
+        return True
     else:
         return False
 

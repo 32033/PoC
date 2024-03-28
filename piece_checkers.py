@@ -60,3 +60,21 @@ def check_castle(board, color, from_, to):
         return True
     else:  # Somewhere else
         return False
+    
+def check_horse(board, color, from_, to):
+    """
+    Can only move two in one direction and then one in the other direction.
+    E.g. two up and one left.
+    """
+
+    horizontal = abs(from_[0] - to[0])
+    vertical = abs(from_[1] - to[1])
+
+    long = max(horizontal, vertical)
+    short = min(horizontal, vertical)
+
+    if long == 2 and short == 1:
+        piece_at_to = board.get(*to)
+        if piece_at_to == "" or piece_at_to[0] != color:
+            return True
+    return False
