@@ -141,6 +141,9 @@ def check_king(board, color, from_, to):
     return False
 
 def king_move_one(from_, to):
+    """
+    Check if the distance moved is only one square either horizontally or diagonally.
+    """
     horizontal = abs(from_[0] - to[0])
     vertical = abs(from_[1] - to[1])
     sum_ = horizontal + vertical
