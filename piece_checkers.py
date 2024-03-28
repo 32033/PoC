@@ -96,7 +96,7 @@ def check_bishop(board, color, from_, to):
         # Check spaces are free
         x_multiplier = -(from_[0] - to[0]) / horizontal
         y_multiplier = -(from_[1] - to[1]) / vertical
-        for n in range(1, horizontal - 1):
+        for n in range(1, horizontal):
             x = int(from_[0] + n * x_multiplier)
             y = int(from_[1] + n * y_multiplier)
             if board.get(x, y) != "":
