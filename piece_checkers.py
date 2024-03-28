@@ -117,6 +117,7 @@ def check_queen(*args):
 def check_king(board, color, from_, to):
     """
     King can move one space in any direction, however cannot move into check.
+    King can also castle given it hasn't moved, with a castle that also hasn't moved.
     """
 
     # Check wouldn't take own color
@@ -125,10 +126,24 @@ def check_king(board, color, from_, to):
         return False
 
     # TODO: Check if move will put in check
+    if king_move_one(from_, to): # If moved straight, or moved one diagonally
+        return True
+
+    # Check castling
+    if (to[0] == 6 and not board.has_moved(*from_) and not board.has_moved(7, from_[1]) and board.get(5, from_[1]) == ""
+            and board.get(6, from_[1]) == ""):  # King moving also accounts for king position
+        return True
+
+    if (to[0] == 2 and not board.has_moved(*from_) and not board.has_moved(0, from_[1]) and board.get(1, from_[1]) == ""
+            and board.get(2, from_[1]) == "" and board.get(3, from_[1]) == ""):
+        return True
+
+    return False
+
+def king_move_one(from_, to):
     horizontal = abs(from_[0] - to[0])
     vertical = abs(from_[1] - to[1])
     sum_ = horizontal + vertical
     if sum_ == 1 or (sum_ == 2 and horizontal == vertical): # If moved straight, or moved one diagonally
         return True
-    else:
-        return False
+    return False

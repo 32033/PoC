@@ -5,17 +5,23 @@ class Board:
     size: int = 8
     pieces: list[str]
     en_passant: Union[tuple[int, int], None]
+    moved: set[int]
 
     def __init__(self):
         self.pieces = Board.make_new()
         self.en_passant_able = set()
         self.en_passant = None
+        self.moved = set()
 
     def get(self, x, y):
         return self.pieces[x + y * Board.size]
 
     def set(self, x, y, piece):
         self.pieces[x + y * Board.size] = piece
+        self.moved.add(x + y * Board.size)
+
+    def has_moved(self, x, y):
+        return (x + y * Board.size) in self.moved
 
     def set_en_passant(self, x, y):
         """

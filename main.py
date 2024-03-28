@@ -47,6 +47,18 @@ def square_clicked(destination):
         else:  # Otherwise remove it
             board.remove_en_passant()
 
+        # Check castling
+        if piece[1] == "k" and not king_move_one(currently_selected, destination):  # If is king and moved more than one then it castled
+            color = piece[0]
+            if destination[0] < currently_selected[0]:  # Left castle
+                board.set(*destination, color + "k")
+                board.set(0, destination[1], "")
+                board.set(3, destination[1], color + "c")
+            else:  # Right castle
+                board.set(*destination, color + "k")
+                board.set(7, destination[1], "")
+                board.set(5, destination[1], color + "c")
+
         currently_selected = None
 
 
