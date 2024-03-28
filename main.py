@@ -3,6 +3,11 @@ from typing import Union
 from board import Board
 from piece_checkers import *
 
+# TODO: Checking if in check
+# TODO:     And hence checking if in check mate
+# TODO: Pawn promotion
+# TODO: Turns?
+
 window = tk.Tk()
 board = Board()
 
