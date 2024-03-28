@@ -83,6 +83,8 @@ def check_if_possible_move(destination):
         return True
     elif piece_type == "b" and check_bishop(board, piece_color, currently_selected, destination):
         return True
+    elif piece_type == "q" and check_queen(board, piece_color, currently_selected, destination):
+        return True
     else:
         return False
 

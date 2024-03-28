@@ -104,3 +104,10 @@ def check_bishop(board, color, from_, to):
     
     else:
         return False
+
+
+def check_queen(*args):
+    """
+    Can move in the union of the movements of bishops and castles (AKA straights and diagonals)
+    """
+    return check_castle(*args) or check_bishop(*args)
