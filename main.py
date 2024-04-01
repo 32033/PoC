@@ -4,8 +4,6 @@ from typing import Union
 from board import Board
 from piece_checkers import *
 
-# TODO: Pawn promotion
-
 window = tk.Tk()
 board = Board()
 
@@ -28,6 +26,8 @@ def square_clicked(destination):
     The board will be redrawn after any changes have been made.
     """
     global currently_selected, turn
+
+    no_redraw = False  # Should we not redraw the board afterward
 
     if currently_selected is None:  # Check nothing selected
         currently_selected = destination
@@ -52,6 +52,12 @@ def square_clicked(destination):
         else:  # Otherwise remove it
             board.remove_en_passant()
 
+        # Check pawn promotion
+        if piece[1] == "p" and destination[1] % 7 == 0:
+            # ^ Checks if it is a pawn, and it is on the top or bottom row
+            promote(destination)  # Changes ui, so do not redraw afterwards
+            no_redraw = True
+
         # Check castling
         if piece[1] == "k" and not king_move_one(currently_selected, destination):  # If is king and moved more than one then it castled
             color = piece[0]
@@ -67,7 +73,8 @@ def square_clicked(destination):
         currently_selected = None
         turn += 1
 
-    redraw_board()
+    if not no_redraw:
+        redraw_board()
 
 
 
@@ -208,6 +215,26 @@ def has_possible_moves(from_: tuple[int, int]):
                 possible_move = True
 
     return possible_move
+
+
+def promote(loc: tuple[int, int]):
+    """
+    Handles the promotion of a pawn, this takes a location of a piece. Then gives the user buttons to select what to
+    promote it to. The color is taken from the piece that used to be at that board location.
+    """
+    def do_promotion(x, y, name: str):
+        color = board.get(x, y)[0]
+        board.set(x, y, color + name)
+        redraw_board()  # Will reset the buttons
+
+    for widget in window.winfo_children():
+        widget.destroy()
+
+    tk.Button(window, text="castle", command=lambda loc_=loc: do_promotion(*loc_, "c")).pack()
+    tk.Button(window, text="horse", command=lambda loc_=loc: do_promotion(*loc_, "h")).pack()
+    tk.Button(window, text="priest", command=lambda loc_=loc: do_promotion(*loc_, "b")).pack()
+    tk.Button(window, text="queen", command=lambda loc_=loc: do_promotion(*loc_, "q")).pack()
+
 
 
 redraw_board()
