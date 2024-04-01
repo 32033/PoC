@@ -47,26 +47,17 @@ class Board:
         board = []
 
         # Add blacks
-        #board += ["bc", "bh", "bb", "bq", "bk", "bb", "bh", "bc"]
-        ##board += ["bp"] * 8
-        #board += [""] * 8
-#
-        ## Empty space
-        #board += [""] * (Board.size * (Board.size - 4))  # Empty space of width * height - (2 for pawns, and 2 for special pieces)
-#
-        ## Add whites
-        #board += [""] * 8
-        ##board += ["wp"] * 8
-        #board += ["wc", "wh", "wb", "wq", "wk", "wb", "wh", "wc"]
+        board += ["bc", "bh", "bb", "bq", "bk", "bb", "bh", "bc"]
+        board += ["bp"] * 8
 
-        board = [""] * Board.size * Board.size
-        board[0] = "wk"
-        #board[20] = "bq"
-        board[30] = "bk"
-        board[9] = "wp"
-        board[55] = "bq"
-        #board[12] = "bq"
-        #board[8] = "bc"
+        # Empty space
+        board += [""] * (Board.size * (Board.size - 4))  # Empty space of width * height - (2 for pawns, and 2 for special pieces)
+
+        # Add whites
+        board += ["wp"] * 8
+        board += ["wc", "wh", "wb", "wq", "wk", "wb", "wh", "wc"]
+
+
 
         return board
 

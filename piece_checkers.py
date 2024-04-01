@@ -128,15 +128,14 @@ def check_king(board, color, from_, to):
     if king_move_one(from_, to): # If moved straight, or moved one diagonally
         return True
 
-    # FIXME: This doesnt work?
-    """# Check castling
+    # Check castling
     if (to[0] == 6 and not board.has_moved(*from_) and not board.has_moved(7, from_[1]) and board.get(5, from_[1]) == ""
             and board.get(6, from_[1]) == ""):  # King moving also accounts for king position
         return True
 
     if (to[0] == 2 and not board.has_moved(*from_) and not board.has_moved(0, from_[1]) and board.get(1, from_[1]) == ""
             and board.get(2, from_[1]) == "" and board.get(3, from_[1]) == ""):
-        return True"""
+        return True
 
     return False
 
