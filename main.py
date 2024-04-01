@@ -18,6 +18,8 @@ currently_selected: Union[tuple[int, int], None] = None
 black_check: bool = False  # Is black currently in check
 white_check: bool = False  # Is white currently in check
 
+turn: int = 0  # Even or 0 for white, odd for black
+
 def square_clicked(destination):
     """
     Called when a button on the board is clicked.
@@ -30,7 +32,7 @@ def square_clicked(destination):
 
     The board will be redrawn after any changes have been made.
     """
-    global currently_selected
+    global currently_selected, turn
 
     if currently_selected is None:  # Check nothing selected
         currently_selected = destination
@@ -68,6 +70,7 @@ def square_clicked(destination):
                 board.set(5, destination[1], color + "c")
 
         currently_selected = None
+        turn += 1
 
         update_checked()
         print(white_check, black_check)
@@ -91,9 +94,13 @@ def redraw_board():
 
             enabled: bool
             if currently_selected is None:
-                enabled = piece != ""
+                enabled = (piece != "" and 
+                           ((turn % 2 == 0 and (piece != "" and piece[0] == "w")) or  # White turn and piece is white
+                            (turn % 2 == 1 and (piece != "" and piece[0] == "b"))))  # Black turn and piece is black
             else:
-                enabled = check_if_possible_move(currently_selected, (x, y))
+                enabled = check_if_possible_move(currently_selected, (x, y))  # Manages teams for us
+            
+                
 
             piece = piece if piece != "" else "."
 
