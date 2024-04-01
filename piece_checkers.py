@@ -114,10 +114,10 @@ def check_queen(*args):
     """
     return check_castle(*args) or check_bishop(*args)
 
-def check_king(board, color, from_, to):
+def check_king(board, color, from_, to, in_check):
     """
     King can move one space in any direction, however cannot move into check.
-    King can also castle given it hasn't moved, with a castle that also hasn't moved.
+    King can also castle given it hasn't moved, with a castle that also hasn't moved. The king may also not castle if it is in check.
     """
 
     # Check wouldn't take own color
@@ -129,13 +129,14 @@ def check_king(board, color, from_, to):
         return True
 
     # Check castling
-    if (to[0] == 6 and not board.has_moved(*from_) and not board.has_moved(7, from_[1]) and board.get(5, from_[1]) == ""
-            and board.get(6, from_[1]) == ""):  # King moving also accounts for king position
-        return True
+    if not in_check:
+        if (to[0] == 6 and not board.has_moved(*from_) and not board.has_moved(7, from_[1]) and board.get(5, from_[1]) == ""
+                and board.get(6, from_[1]) == ""):  # King moving also accounts for king position
+            return True
 
-    if (to[0] == 2 and not board.has_moved(*from_) and not board.has_moved(0, from_[1]) and board.get(1, from_[1]) == ""
-            and board.get(2, from_[1]) == "" and board.get(3, from_[1]) == ""):
-        return True
+        if (to[0] == 2 and not board.has_moved(*from_) and not board.has_moved(0, from_[1]) and board.get(1, from_[1]) == ""
+                and board.get(2, from_[1]) == "" and board.get(3, from_[1]) == ""):
+            return True
 
     return False
 

@@ -146,7 +146,7 @@ def check_if_possible_move(from_: tuple[int, int], to: tuple[int, int], test_boa
         pass
     elif piece_type == "q" and check_queen(test_board, piece_color, from_, to):
         pass
-    elif piece_type == "k" and check_king(test_board, piece_color, from_, to):
+    elif piece_type == "k" and check_king(test_board, piece_color, from_, to, check_checked(piece_color, test_board, False)):
         pass
     else:
         return False  # Cannot move piece there so return false
@@ -169,7 +169,7 @@ class NoKingException(Exception):
         return f"No king with color \"{self.color}\" found!"
 
 
-def check_checked(color: str, test_board: Board) -> bool:
+def check_checked(color: str, test_board: Board, consider_king_move=True) -> bool:
     """
     An internal helper function to check if the king of a certain color would be in check.
     This can check a duplicate of the board so unmade moves can be checked.
@@ -200,7 +200,7 @@ def check_checked(color: str, test_board: Board) -> bool:
         for y2 in range(test_board.size):
             piece = test_board.get(x2, y2)
 
-            if piece == "":
+            if piece == "" or (piece[1] == "k" and not consider_king_move):
                 continue
             elif piece[0] == color2:
 
