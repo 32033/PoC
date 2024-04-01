@@ -1,3 +1,4 @@
+import copy
 import tkinter as tk
 from typing import Union
 from board import Board
@@ -6,7 +7,7 @@ from piece_checkers import *
 # TODO: ~~Checking if in check~~
 # TODO:     And hence checking if in check mate
 # TODO: Pawn promotion
-# TODO: Turns?
+# TODO: Differentiate between stalemate and checkmate (based of who's turn it is)
 
 window = tk.Tk()
 board = Board()
@@ -14,9 +15,6 @@ board = Board()
 debug_colors: bool = True  # Show colors depending on the states of various parts of the board
 
 currently_selected: Union[tuple[int, int], None] = None
-
-black_check: bool = False  # Is black currently in check
-white_check: bool = False  # Is white currently in check
 
 turn: int = 0  # Even or 0 for white, odd for black
 
@@ -72,9 +70,6 @@ def square_clicked(destination):
         currently_selected = None
         turn += 1
 
-        update_checked()
-        print(white_check, black_check)
-
     redraw_board()
 
 
@@ -88,6 +83,8 @@ def redraw_board():
     for widget in window.winfo_children():
         widget.destroy()
 
+    found_possible_move: bool = False
+
     for x in range(board.size):
         for y in range(board.size):
             piece = board.get(x, y)
@@ -97,10 +94,10 @@ def redraw_board():
                 enabled = (piece != "" and 
                            ((turn % 2 == 0 and (piece != "" and piece[0] == "w")) or  # White turn and piece is white
                             (turn % 2 == 1 and (piece != "" and piece[0] == "b"))))  # Black turn and piece is black
+                enabled = enabled and has_possible_moves((x, y))  # Check if piece has possible moves that do not put us in check
+                found_possible_move = enabled or found_possible_move
             else:
-                enabled = check_if_possible_move(currently_selected, (x, y))  # Manages teams for us
-            
-                
+                enabled = check_if_possible_move(currently_selected, (x, y), board)  # Manages teams for us, and checks that moves do not allow check
 
             piece = piece if piece != "" else "."
 
@@ -108,80 +105,108 @@ def redraw_board():
             if debug_colors:
                 if board.is_en_passant(x, y):
                     color = "red"
-                if black_check and piece == "bk":
-                    color = "yellow"
-                if white_check and piece == "wk":
-                    color = "yellow"
 
             b = tk.Button(window, fg=color, text=piece, state=tk.DISABLED if not enabled else tk.NORMAL,
                           command=lambda destination=(x, y): square_clicked(destination))
             b.grid(row=y, column=x)
 
+    if currently_selected is None and not found_possible_move:
+        print("Checkmate")
 
-def check_if_possible_move(from_: tuple[int, int], to):
+
+def check_if_possible_move(from_: tuple[int, int], to: tuple[int, int], test_board: Board):
     """
     Checks if it is possible to move the piece at currently_selected to the coords at coords.
     Returns true if the move is possible.
     Returns true if the move is the same.
+    :param test_board: The board to use
     """
 
-    piece_color, piece_type = board.get(*from_)
+    # Check move is valid
+    piece_color, piece_type = test_board.get(*from_)
     if to == from_:  # Same piece return true
         return True
-    elif piece_type == "p" and check_pawn(board, piece_color, from_, to):
-        return True
-    elif piece_type == "c" and check_castle(board, piece_color, from_, to):
-        return True
-    elif piece_type == "h" and check_horse(board, piece_color, from_, to):
-        return True
-    elif piece_type == "b" and check_bishop(board, piece_color, from_, to):
-        return True
-    elif piece_type == "q" and check_queen(board, piece_color, from_, to):
-        return True
-    elif piece_type == "k" and check_king(board, piece_color, from_, to):
-        return True
+    elif piece_type == "p" and check_pawn(test_board, piece_color, from_, to):
+        pass
+    elif piece_type == "c" and check_castle(test_board, piece_color, from_, to):
+        pass
+    elif piece_type == "h" and check_horse(test_board, piece_color, from_, to):
+        pass
+    elif piece_type == "b" and check_bishop(test_board, piece_color, from_, to):
+        pass
+    elif piece_type == "q" and check_queen(test_board, piece_color, from_, to):
+        pass
+    elif piece_type == "k" and check_king(test_board, piece_color, from_, to):
+        pass
     else:
-        return False
+        return False  # Cannot move piece there so return false
 
-def update_checked():
+    # Moves are valid, but now we need to test if the cause check
+    new_test_board = copy.deepcopy(test_board)
+    new_test_board.set(*to, test_board.get(*from_))
+    new_test_board.set(*from_, "")
+    return not check_checked(piece_color, new_test_board)  # If doesn't cause check then return True
+
+def check_checked(color: str, test_board: Board) -> bool:
     """
-    Update the global flags: black_check and white_check.
+    An internal helper function to check if the king of a certain color would be in check.
+    This can check a duplicate of the board so unmade moves can be checked.
+    :param color: The color of the king
+    :param test_board: The board to use
+    :return: True if in check
     """
-    global black_check, white_check
 
-    def check_checked(color: str, color2: str) -> bool:
-        """
-        An internal helper function to check if the king of a certain color would be in check.
-        :param color: The color of the king
-        :param color2: The color of the pieces attacking the king
-        :return: True if in check
-        """
+    color2: str  # Color of piece attacking the king
+    if color == "b":
+        color2 = "w"
+    else:
+        color2 = "b"
 
-        # First we locate which square the king is at
-        for x in range(board.size):
-            for y in range(board.size):
-                if board.get(x, y) == color + "k":
-                    break
-            else:  # If y is not broke then enter this block
+    # First we locate which square the king is at
+    for x in range(test_board.size):
+        for y in range(test_board.size):
+            if test_board.get(x, y) == color + "k":
+                break
+        else:  # If y is not broke then enter this block
+            continue
+        break  # First loop broke, so break outer
+    else: # Outer was not broke so king not found
+        raise Exception(f"No king with color \"{color}\" found!")
+
+    # King is at (x, y). Now check if any piece of color2 can take it
+    for x2 in range(test_board.size):
+        for y2 in range(test_board.size):
+            piece = test_board.get(x2, y2)
+
+            if piece == "":
                 continue
-            break  # First loop broke, so break outer
-        else: # Outer was not broke so king not found
-            raise Exception(f"No king with color \"{color}\" found!")
+            elif piece[0] == color2:
+                if (x, y) == (0, 1) and (x2, y2) == (4, 1):
+                    "input()"
 
-        # King is at (x, y). Now check if any piece of color2 can take it
-        for x2 in range(board.size):
-            for y2 in range(board.size):
-                piece = board.get(x2, y2)
+                if check_if_possible_move((x2, y2), (x, y), test_board):
+                    return True
+    return False
 
-                if piece == "":
-                    continue
-                elif piece[0] == color2:
-                    if check_if_possible_move((x2, y2), (x, y)):
-                        return True
-        return False
 
-    black_check = check_checked("b", "w")
-    white_check = check_checked("w", "b")
+def has_possible_moves(from_: tuple[int, int]):
+    """
+    Checks if there are any possible moves from the given location that do not result in the king of the same color being in check afterwards.
+    :return: True if there are possible moves
+    """
+
+    possible_move = False
+
+    # To do this we loop through every possible move this piece has
+    for x in range(board.size):
+        for y in range(board.size):
+            if (x, y) == from_:  # We don't care about this
+                continue
+
+            if check_if_possible_move(from_, (x, y), board):  # Will check if move puts us in check
+                possible_move = True
+
+    return possible_move
 
 
 redraw_board()

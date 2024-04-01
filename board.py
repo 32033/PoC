@@ -1,3 +1,4 @@
+import copy
 from typing import Union
 
 
@@ -46,16 +47,39 @@ class Board:
         board = []
 
         # Add blacks
-        board += ["bc", "bh", "bb", "bq", "bk", "bb", "bh", "bc"]
-        board += ["bp"] * 8
+        #board += ["bc", "bh", "bb", "bq", "bk", "bb", "bh", "bc"]
+        ##board += ["bp"] * 8
         #board += [""] * 8
-
-        # Empty space
-        board += [""] * (Board.size * (Board.size - 4))  # Empty space of width * height - (2 for pawns, and 2 for special pieces)
-
-        # Add whites
+#
+        ## Empty space
+        #board += [""] * (Board.size * (Board.size - 4))  # Empty space of width * height - (2 for pawns, and 2 for special pieces)
+#
+        ## Add whites
         #board += [""] * 8
-        board += ["wp"] * 8
-        board += ["wc", "wh", "wb", "wq", "wk", "wb", "wh", "wc"]
+        ##board += ["wp"] * 8
+        #board += ["wc", "wh", "wb", "wq", "wk", "wb", "wh", "wc"]
 
+        board = [""] * Board.size * Board.size
+        board[0] = "wk"
+        board[20] = "bq"
+        board[30] = "bk"
+        board[12] = "bq"
+        #board[8] = "bc"
+
+        return board
+
+    def __copy__(self):
+        board = Board()
+        board.pieces = self.pieces
+        board.en_passant_able = self.en_passant_able
+        board.en_passant = self.en_passant
+        board.moved = self.moved
+        return board
+
+    def __deepcopy__(self, memo):
+        board = Board()
+        board.pieces = copy.deepcopy(self.pieces)
+        board.en_passant_able = copy.deepcopy(self.en_passant_able)
+        board.en_passant = copy.deepcopy(self.en_passant)
+        board.moved = copy.deepcopy(self.moved)
         return board
