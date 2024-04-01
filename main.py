@@ -4,7 +4,6 @@ from typing import Union
 from board import Board
 from piece_checkers import *
 
-# TODO: Handle checkmate
 # TODO: Pawn promotion
 
 window = tk.Tk()
@@ -108,13 +107,14 @@ def redraw_board():
                           command=lambda destination=(x, y): square_clicked(destination))
             b.grid(row=y, column=x)
 
+    # Check for checkmates / stalemates
     if currently_selected is None and not found_possible_move:
-        if check_checked("w", board) and turn % 2 == 0:
-            print("White in checkmate")
-        elif check_checked("b", board) and turn % 2 == 1:
-            print("Black in checkmate")
-        else:
-            print("Stalemate")
+        if check_checked("w", board) and turn % 2 == 0:  # White to move, but nothing to get out of check and in check
+            tk.Label(window, text="Black wins").grid(columnspan=8)
+        elif check_checked("b", board) and turn % 2 == 1:  # Black to move, but nothing to get out of check and in check
+            tk.Label(window, text="White wins").grid(columnspan=8)
+        else:  # Not in check but no moves
+            tk.Label(window, text="Stalemate").grid(columnspan=8)
 
 
 def check_if_possible_move(from_: tuple[int, int], to: tuple[int, int], test_board: Board):
