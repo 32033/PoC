@@ -155,7 +155,19 @@ def check_if_possible_move(from_: tuple[int, int], to: tuple[int, int], test_boa
     new_test_board = copy.deepcopy(test_board)
     new_test_board.set(*to, test_board.get(*from_))
     new_test_board.set(*from_, "")
-    return not check_checked(piece_color, new_test_board)  # If doesn't cause check then return True
+    try:
+        return not check_checked(piece_color, new_test_board)  # If doesn't cause check then return True
+    except NoKingException:
+        return False  # As probably resulted in a check
+
+
+class NoKingException(Exception):
+    def __init__(self, color: str):
+        self.color = color
+
+    def __str__(self):
+        return f"No king with color \"{self.color}\" found!"
+
 
 def check_checked(color: str, test_board: Board) -> bool:
     """
@@ -181,7 +193,7 @@ def check_checked(color: str, test_board: Board) -> bool:
             continue
         break  # First loop broke, so break outer
     else: # Outer was not broke so king not found
-        raise Exception(f"No king with color \"{color}\" found!")
+        raise NoKingException(color)
 
     # King is at (x, y). Now check if any piece of color2 can take it
     for x2 in range(test_board.size):

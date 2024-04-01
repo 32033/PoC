@@ -61,9 +61,11 @@ class Board:
 
         board = [""] * Board.size * Board.size
         board[0] = "wk"
-        board[20] = "bq"
+        #board[20] = "bq"
         board[30] = "bk"
-        board[12] = "bq"
+        board[9] = "wp"
+        board[55] = "bq"
+        #board[12] = "bq"
         #board[8] = "bc"
 
         return board
