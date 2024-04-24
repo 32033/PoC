@@ -41,8 +41,8 @@ def square_clicked(destination):
         board.set(*destination, piece)
 
         # Check kill via en passant
-        if piece[1] == "p" and currently_selected[0] != destination[0] and board.get(*destination) != "":
-            # ^ If the piece being moved is a pawn, it moves in the x direction but to an empty space
+        if piece[1] == "p" and currently_selected[0] != destination[0] and board.get(*destination) != "" and board.is_en_passant(destination[0], currently_selected[1]):
+            # ^ If the piece being moved is a pawn, it moves in the x direction but to an empty space, and that piece is en passantable (a pawn that just moved two)
             board.set(destination[0], currently_selected[1], "")
 
         # Check enable en passant
